@@ -16,22 +16,14 @@ class ListViewController: UIViewController {
   
   var listViewModel: ListViewModel!
   
-//  var listView: ListView! {
-//    return view as! ListView
-//  }
-
-  var listView = ListView()
-  
-//  override func loadView() {
-//    view = ListView()
-//  }
+  var customView = ListView()
   
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    view.addSubview(listView)
+    view.addSubview(customView)
     
-    listView.snp.makeConstraints { make in
+    customView.snp.makeConstraints { make in
       make.top.left.bottom.right.equalTo(view)
     }
     
@@ -46,19 +38,16 @@ class ListViewController: UIViewController {
   }
 
   func bind() {
-    listView.addButton.rx.tap
-      .subscribe {
+    customView.addButton.rx.tap.subscribe(onNext: {
         self.listViewModel.addNewRow()
-      }
-      .disposed(by: disposeBag)
+      }).disposed(by: disposeBag)
 
-    listView.removeButton.rx.tap
-      .subscribe {
+    customView.removeButton.rx.tap
+      .subscribe(onNext: {
         self.listViewModel.removeFirstRow()
-      }
-      .disposed(by: disposeBag)
+      }).disposed(by: disposeBag)
     
-    listViewModel.strings.bind(to: listView.tableView.rx
+    listViewModel.strings.bind(to: customView.tableView.rx
       .items(cellIdentifier: ListView.cellIdentifier, cellType: UITableViewCell.self)) {  row, element, cell in
         cell.textLabel?.text = "\(element) \(row)"
       }
